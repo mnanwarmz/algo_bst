@@ -16,17 +16,23 @@ public:
 
 	node *insert(node *r, int v)
 	{
+		// recursively call the insert function – refer to algorithm
 		if (r == NULL)
 		{
 			r = new node;
 			r->d = v;
 			r->l = NULL;
 			r->r = NULL;
+			return r;
 		}
 		else if (v < r->d)
+		{
 			r->l = insert(r->l, v);
-		else
+		}
+		else if (v >= r->d)
+		{
 			r->r = insert(r->r, v);
+		}
 		return r;
 	}
 
@@ -35,7 +41,7 @@ public:
 		if (p == NULL)
 			return p;
 
-		if (v < p->d)
+		if (v < p->d) //to find the value whether less or more
 			p->l = deleteItem(p->l, v);
 		else
 		{
@@ -43,28 +49,23 @@ public:
 				p->r = deleteItem(p->r, v);
 			else
 			{
-				if (p->l == NULL && p->r == NULL)
-				{
-					delete p;
+				if ((p->l == NULL) && (p->r == NULL)) // no child
 					p = NULL;
-				}
-				else if (p->l == NULL)
+				else if ((p->l == NULL) || (p->r == NULL)) // one child
 				{
-					node *temp = p;
-					p = p->r;
-					delete temp;
+					node *temp;
+					if (p->r != NULL)
+						temp = p->r;
+					else
+						temp = p->l;
+					p = temp;
 				}
-				else if (p->r == NULL)
+				else // two child nodes
 				{
-					node *temp = p;
-					p = p->l;
-					delete temp;
-				}
-				else
-				{
-					node *temp = p;
-					p = getSuccessor(p);
-					delete temp;
+					// use getSuccessor() here
+					node *temp = getSuccessor(p->l);
+					p->d = temp->d;					  //delete old node replace data
+					p->l = deleteItem(p->l, temp->d); //find the data that replaced the old one and remove it
 				}
 			}
 		}
@@ -73,125 +74,10 @@ public:
 
 	node *getSuccessor(node *p) // used in delete function
 	{
-		node *current = p->r;
-		node *successor = p;
-		while (current != NULL)
-		{
-			successor = current;
-			current = current->l;
-		}
-		return successor;
-	}
-
-	node *find(node *p, int v)
-	{
-		if (p == NULL)
+		if (p->r == NULL)
 			return p;
-		if (v < p->d)
-			return find(p->l, v);
-		else if (v > p->d)
-			return find(p->r, v);
 		else
-			return p;
-	}
-
-	int height(node *p)
-	{
-		if (p == NULL)
-			return 0;
-		else
-		{
-			int lh = height(p->l);
-			int rh = height(p->r);
-			if (lh > rh)
-				return (lh + 1);
-			else
-				return (rh + 1);
-		}
-	}
-
-	int balanceFactor(node *p)
-	{
-		if (p == NULL)
-			return 0;
-		else
-			return (height(p->l) - height(p->r));
-	}
-
-	node *balance()
-	{
-		int h = height(root);
-		if (h > 1)
-		{
-			if (balanceFactor(root->l) > 0)
-				root->l = leftRotate(root->l);
-			root = rightRotate(root);
-		}
-		else if (h < -1)
-		{
-			if (balanceFactor(root->r) < 0)
-				root->r = rightRotate(root->r);
-			root = leftRotate(root);
-		}
-		return root;
-	}
-
-	node *leftRotate(node *p)
-	{
-		node *q = p->r;
-		p->r = q->l;
-		q->l = p;
-		return q;
-	}
-
-	node *rightRotate(node *p)
-	{
-		node *q = p->l;
-		p->l = q->r;
-		q->r = p;
-		return q;
-	}
-
-	node *leftRightRotate(node *p)
-	{
-		p->l = leftRotate(p->l);
-		return rightRotate(p);
-	}
-
-	node *rightLeftRotate(node *p)
-	{
-		p->r = rightRotate(p->r);
-		return leftRotate(p);
-	}
-
-	void inorder(node *p)
-	{
-		if (p != NULL)
-		{
-			inorder(p->l);
-			cout << p->d << " ";
-			inorder(p->r);
-		}
-	}
-
-	void preorder(node *p)
-	{
-		if (p != NULL)
-		{
-			cout << p->d << " ";
-			preorder(p->l);
-			preorder(p->r);
-		}
-	}
-
-	void postOrder(node *p)
-	{
-		if (p != NULL)
-		{
-			postOrder(p->l);
-			postOrder(p->r);
-			cout << p->d << " ";
-		}
+			return (getSuccessor(p->r));
 	}
 
 	void show(node *p, int lvl)

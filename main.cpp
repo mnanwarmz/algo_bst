@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "bst.cpp"
+#include "avl.cpp"
 
 using namespace std;
 
@@ -36,6 +37,8 @@ int main()
 			}
 			cout << "Tree:" << endl;
 			tree.show(tree.root, 1);
+			cout << endl;
+
 			cout << endl;
 			break;
 		case 4:
